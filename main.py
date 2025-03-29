@@ -1,11 +1,19 @@
-from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import Integer, String, create_engine
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    sessionmaker,
+)
 
 # Database setup
 DATABASE_URL = "sqlite:///example.db"
 engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(bind=engine)
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 # 1. Definition of POD class (Plain Old Data)
@@ -23,9 +31,9 @@ class UserData:
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    age = Column(Integer, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    age: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Conversion from POD to ORM
     @classmethod
@@ -53,6 +61,8 @@ session.commit()
 
 # Retrieve ORM from the database and convert to POD
 retrieved_user = session.query(User).filter(User.id == 1).first()
+if retrieved_user is None:
+    raise ValueError("User not found in the database")
 user_pod = retrieved_user.to_pod()
 print(user_pod)  # Output: UserData(id=1, name=Alice, age=30)
 
