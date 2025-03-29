@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy import Integer, String, create_engine
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -5,6 +7,11 @@ from sqlalchemy.orm import (
     mapped_column,
     sessionmaker,
 )
+
+# Check if the database file exists
+if os.path.exists("example.db"):
+    print("example.db already exists. Please delete it and rerun the script.")
+    exit()
 
 # Database setup
 DATABASE_URL = "sqlite:///example.db"
